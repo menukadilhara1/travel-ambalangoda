@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Travel Ambalangoda</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- LEAFLET CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -154,6 +157,14 @@
     .acard { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; }
     .acard h4 { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
     .acard p { font-size: 13px; color: var(--muted); line-height: 1.7; font-weight: 300; }
+    
+    /* Map & Weather CSS */
+    .map-container { width: 100%; height: 400px; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-top: 1rem; z-index: 10; }
+    .weather-widget { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, var(--ocean), #7faac9); color: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(78, 127, 163, 0.2); }
+    .w-temp { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 500; }
+    .w-cond { font-size: 15px; font-weight: 400; opacity: 0.9; margin-bottom: 4px; }
+    .w-adv { font-size: 12px; opacity: 0.8; line-height: 1.4; max-width: 300px; font-weight: 300; }
+    .w-icon { font-size: 50px; }
   </style>
 </head>
 <body>
@@ -187,6 +198,15 @@
     <div class="stat"><span class="stat-n">4</span><span class="stat-l">Categories</span></div>
   </div>
   <div class="container">
+    <!-- Weather Widget -->
+    <div class="weather-widget" id="weather-widget">
+      <div>
+        <div class="w-cond" id="w-cond">Loading...</div>
+        <div class="w-temp" id="w-temp">--°C</div>
+        <div class="w-adv" id="w-adv">Fetching live weather data for Ambalangoda...</div>
+      </div>
+      <div class="w-icon" id="w-icon">⛅</div>
+    </div>
     <div class="sec-title">Browse by Category</div>
     <div class="cat-grid">
       <div class="cat-card" onclick="filterGo('Beach & Relaxation')"><span class="cat-icon">🏖️</span><div class="cat-name">Beach & Relaxation</div><div class="cat-count">2 places</div></div>
@@ -203,6 +223,9 @@
 <div class="page" id="page-places">
   <div class="container">
     <div class="sec-title">All Destinations</div>
+    <!-- Interactive Map -->
+    <div class="map-container" id="explore-map" style="margin-bottom: 2rem;"></div>
+    
     <div class="filter-row" id="filters"></div>
     <div class="places-grid" id="all-places"></div>
   </div>
@@ -263,16 +286,16 @@
 
   // ── Data ──
   const places = [
-    {id:1,name:"Ambalangoda Beach",cat:"Beach & Relaxation",dist:"0 km",emoji:"🏖️",bg:"#EBF3F9",desc:"A scenic coastal beach ideal for swimming, sunsets, and relaxing walks along the shoreline.",hours:"Open 24 hours",fee:"Free entry",transport:"Walking distance from town center",season:"November – April"},
-    {id:2,name:"Sri Vijayarama Viharaya",cat:"Culture & History",dist:"~2 km",emoji:"🛕",bg:"#FAF0EA",desc:"An ancient Buddhist temple featuring large Buddha statues and significant religious heritage.",hours:"6:00 AM – 8:00 PM",fee:"Free (donations welcome)",transport:"Tuk-tuk from town (~LKR 150)",season:"Year-round"},
-    {id:3,name:"Ambalangoda Mask Museum",cat:"Culture & History",dist:"~1 km",emoji:"🎭",bg:"#FAF0EA",desc:"A cultural museum showcasing traditional Sri Lankan mask carving, a craft Ambalangoda is world-famous for.",hours:"8:00 AM – 5:30 PM",fee:"LKR 500 (adults)",transport:"Walking distance or tuk-tuk",season:"Year-round"},
-    {id:4,name:"Madu Ganga River Safari",cat:"Nature & Wildlife",dist:"~5 km",emoji:"🛶",bg:"#EAF1EC",desc:"A UNESCO-recognized wetland offering scenic mangrove boat safaris through a rich biodiversity zone.",hours:"6:00 AM – 6:00 PM",fee:"LKR 2,500–3,500 (boat hire)",transport:"Tuk-tuk (~LKR 300)",season:"Year-round"},
-    {id:5,name:"Kosgoda Turtle Hatchery",cat:"Nature & Wildlife",dist:"~8 km",emoji:"🐢",bg:"#EAF1EC",desc:"A conservation hatchery protecting endangered sea turtles, offering guided visits and turtle release experiences.",hours:"7:00 AM – 6:00 PM",fee:"LKR 500 (adults)",transport:"Bus or tuk-tuk from Ambalangoda",season:"Year-round"},
-    {id:6,name:"Meetiyagoda Moonstone Mine",cat:"Nature & Wildlife",dist:"~10 km",emoji:"💎",bg:"#EAF1EC",desc:"One of the very few moonstone mines in the world, offering a unique geological and cultural experience.",hours:"8:00 AM – 5:00 PM",fee:"Free entry",transport:"Tuk-tuk (~LKR 500)",season:"Year-round"},
-    {id:7,name:"Hikkaduwa Beach",cat:"Adventure & Activities",dist:"~12 km",emoji:"🤿",bg:"#FDF6E6",desc:"A world-renowned beach destination famous for snorkeling, coral reef exploration, and vibrant beach life.",hours:"Open 24 hours",fee:"Free (water sports extra)",transport:"Bus from Ambalangoda (~LKR 50)",season:"November – April"},
-    {id:8,name:"Lunuganga Gardens",cat:"Culture & History",dist:"~15 km",emoji:"🌸",bg:"#FAF0EA",desc:"The country estate of legendary Sri Lankan architect Geoffrey Bawa, featuring beautifully landscaped tropical gardens.",hours:"9:00 AM – 5:00 PM",fee:"LKR 1,500 (adults)",transport:"Tuk-tuk or hired car",season:"Year-round"},
-    {id:9,name:"Galle Fort",cat:"Culture & History",dist:"~20 km",emoji:"🏰",bg:"#FAF0EA",desc:"A UNESCO World Heritage Site featuring Dutch colonial architecture, historic ramparts, boutique shops, and museums.",hours:"Open 24 hours (ramparts)",fee:"Free (museum entry extra)",transport:"Bus or train from Ambalangoda",season:"Year-round"},
-    {id:10,name:"Bentota Beach",cat:"Beach & Relaxation",dist:"~22 km",emoji:"🌅",bg:"#EBF3F9",desc:"A tranquil beach resort area known for water sports, golden sands, and riverside resorts.",hours:"Open 24 hours",fee:"Free (water sports extra)",transport:"Train from Ambalangoda (~LKR 80)",season:"November – April"}
+    {id:1,name:"Ambalangoda Beach",cat:"Beach & Relaxation",dist:"0 km",emoji:"🏖️",bg:"#EBF3F9",lat:6.2333,lng:80.0500,desc:"A scenic coastal beach ideal for swimming, sunsets, and relaxing walks along the shoreline.",hours:"Open 24 hours",fee:"Free entry",transport:"Walking distance from town center",season:"November – April"},
+    {id:2,name:"Sri Vijayarama Viharaya",cat:"Culture & History",dist:"~2 km",emoji:"🛕",bg:"#FAF0EA",lat:6.2400,lng:80.0600,desc:"An ancient Buddhist temple featuring large Buddha statues and significant religious heritage.",hours:"6:00 AM – 8:00 PM",fee:"Free (donations welcome)",transport:"Tuk-tuk from town (~LKR 150)",season:"Year-round"},
+    {id:3,name:"Ambalangoda Mask Museum",cat:"Culture & History",dist:"~1 km",emoji:"🎭",bg:"#FAF0EA",lat:6.2380,lng:80.0520,desc:"A cultural museum showcasing traditional Sri Lankan mask carving, a craft Ambalangoda is world-famous for.",hours:"8:00 AM – 5:30 PM",fee:"LKR 500 (adults)",transport:"Walking distance or tuk-tuk",season:"Year-round"},
+    {id:4,name:"Madu Ganga River Safari",cat:"Nature & Wildlife",dist:"~5 km",emoji:"🛶",bg:"#EAF1EC",lat:6.2750,lng:80.0380,desc:"A UNESCO-recognized wetland offering scenic mangrove boat safaris through a rich biodiversity zone.",hours:"6:00 AM – 6:00 PM",fee:"LKR 2,500–3,500 (boat hire)",transport:"Tuk-tuk (~LKR 300)",season:"Year-round"},
+    {id:5,name:"Kosgoda Turtle Hatchery",cat:"Nature & Wildlife",dist:"~8 km",emoji:"🐢",bg:"#EAF1EC",lat:6.3110,lng:80.0070,desc:"A conservation hatchery protecting endangered sea turtles, offering guided visits and turtle release experiences.",hours:"7:00 AM – 6:00 PM",fee:"LKR 500 (adults)",transport:"Bus or tuk-tuk from Ambalangoda",season:"Year-round"},
+    {id:6,name:"Meetiyagoda Moonstone Mine",cat:"Nature & Wildlife",dist:"~10 km",emoji:"💎",bg:"#EAF1EC",lat:6.2080,lng:80.0890,desc:"One of the very few moonstone mines in the world, offering a unique geological and cultural experience.",hours:"8:00 AM – 5:00 PM",fee:"Free entry",transport:"Tuk-tuk (~LKR 500)",season:"Year-round"},
+    {id:7,name:"Hikkaduwa Beach",cat:"Adventure & Activities",dist:"~12 km",emoji:"🤿",bg:"#FDF6E6",lat:6.1400,lng:80.0980,desc:"A world-renowned beach destination famous for snorkeling, coral reef exploration, and vibrant beach life.",hours:"Open 24 hours",fee:"Free (water sports extra)",transport:"Bus from Ambalangoda (~LKR 50)",season:"November – April"},
+    {id:8,name:"Lunuganga Gardens",cat:"Culture & History",dist:"~15 km",emoji:"🌸",bg:"#FAF0EA",lat:6.4020,lng:80.0080,desc:"The country estate of legendary Sri Lankan architect Geoffrey Bawa, featuring beautifully landscaped tropical gardens.",hours:"9:00 AM – 5:00 PM",fee:"LKR 1,500 (adults)",transport:"Tuk-tuk or hired car",season:"Year-round"},
+    {id:9,name:"Galle Fort",cat:"Culture & History",dist:"~20 km",emoji:"🏰",bg:"#FAF0EA",lat:6.0270,lng:80.2170,desc:"A UNESCO World Heritage Site featuring Dutch colonial architecture, historic ramparts, boutique shops, and museums.",hours:"Open 24 hours (ramparts)",fee:"Free (museum entry extra)",transport:"Bus or train from Ambalangoda",season:"Year-round"},
+    {id:10,name:"Bentota Beach",cat:"Beach & Relaxation",dist:"~22 km",emoji:"🌅",bg:"#EBF3F9",lat:6.4250,lng:79.9960,desc:"A tranquil beach resort area known for water sports, golden sands, and riverside resorts.",hours:"Open 24 hours",fee:"Free (water sports extra)",transport:"Train from Ambalangoda (~LKR 80)",season:"November – April"}
   ];
 
   const itins = {
@@ -366,6 +389,55 @@
 
   function filterGo(cat){go('places');setTimeout(()=>renderAll(cat),30);}
 
+  // ── Open-Meteo Weather Integration ──
+  async function fetchLiveWeather() {
+    try {
+      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=6.233&longitude=80.05&current=temperature_2m,weather_code&timezone=auto');
+      const data = await res.json();
+      const temp = Math.round(data.current.temperature_2m);
+      const code = data.current.weather_code;
+      
+      let condition = 'Clear / Sunny'; let icon = '☀️'; let advice = 'Perfect weather for beach activities and exploring town!';
+      if(code > 0 && code <= 3) { condition = 'Partly Cloudy'; icon = '🌥️'; }
+      if(code >= 51 && code <= 67) { condition = 'Rain Showers'; icon = '🌧️'; advice = 'Carry an umbrella! Great time for the Mask Museum or indoor temples.'; }
+      if(code >= 80) { condition = 'Heavy Rain / Storm'; icon = '⛈️'; advice = 'Heavy rains expected. Please avoid boating or beach activities.'; }
+
+      document.getElementById('w-temp').textContent = temp + '°C';
+      document.getElementById('w-cond').textContent = condition;
+      document.getElementById('w-icon').textContent = icon;
+      document.getElementById('w-adv').textContent = advice;
+    } catch (e) {
+      document.getElementById('w-adv').textContent = 'Unable to load live weather.';
+    }
+  }
+  
+  // ── Leaflet Interactive Map ──
+  let theMap = null;
+  function initMap() {
+    if(theMap) return;
+    theMap = L.map('explore-map').setView([6.233, 80.05], 11);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap &copy; CARTO'
+    }).addTo(theMap);
+
+    places.forEach(p => {
+      const marker = L.marker([p.lat, p.lng]).addTo(theMap);
+      marker.bindPopup(`<b>${p.name}</b><br>${p.cat}<br><br><span style="font-size:11px;color:#c4714A;cursor:pointer" onclick="showDetail(${p.id})">View Details ></span>`);
+    });
+  }
+
+  // Hook into 'go' to init map when they click Explore tab
+  const origGo = go;
+  go = function(name) {
+    origGo(name);
+    if(name === 'places') {
+       setTimeout(() => { if(!theMap) initMap(); else theMap.invalidateSize(); }, 50);
+    }
+  };
+
+  fetchLiveWeather();
   document.getElementById('home-places').innerHTML=places.slice(0,3).map(card).join('');
 </script>
 </body>
