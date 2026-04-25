@@ -15,10 +15,11 @@ return [
 
     'allowed_origins' => [
         'https://*.pages.dev',          // Cloudflare Pages (any subdomain)
-        'https://your-domain.com',      // Replace with your real domain later
-        'http://localhost',             // Local testing
+        'http://167.71.193.120',        // Droplet itself
+        'http://167.71.193.120:8080',   // Droplet port 8080
+        'http://localhost',
         'http://127.0.0.1',
-        'null',                         // Allows file:// for local HTML testing
+        'null',
     ],
 
     'allowed_origins_patterns' => [],
