@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Ambalangoda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --white: #ffffff;
+      --bg: #F9F7F4;
+      --sand: #EDE8E0;
+      --border: #DDD8CE;
+      --text: #2C2420;
+      --muted: #7A7068;
+      --light: #B0A89E;
+      --terra: #C4714A;
+      --sage: #6B9478;
+      --ocean: #4E7FA3;
+      --gold: #B89640;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text); }
+    .logo span { color: var(--terra); }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: none; }
+    .nav-links a:hover, .nav-links a.active { color: var(--terra); }
+
+    /* User info + logout */
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 1rem;
+      border-left: 1px solid var(--border);
+    }
+    .nav-user-name {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .logout-btn {
+      font-size: 12px;
+      color: var(--terra);
+      cursor: pointer;
+      background: none;
+      border: 1px solid var(--terra);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .logout-btn:hover { background: var(--terra); color: #fff; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+    .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .hero {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+    .hero h1 span { color: var(--terra); }
+    .hero p { color: var(--muted); font-size: 15px; font-weight: 300; max-width: 420px; margin: 0 auto 1.5rem; line-height: 1.7; }
+    .hero-btn { background: var(--terra); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .hero-btn:hover { background: #B5613A; }
+
+    .stats { display: flex; justify-content: center; gap: 3rem; background: var(--white); border-bottom: 1px solid var(--border); padding: 1.2rem; }
+    .stat { text-align: center; }
+    .stat-n { font-family: 'Playfair Display', serif; font-size: 24px; display: block; color: var(--text); }
+    .stat-l { font-size: 11px; color: var(--light); letter-spacing: 0.3px; }
+
+    .sec-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 400; margin-bottom: 1.2rem; }
+
+    .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 2rem; }
+    .cat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 0.8rem; text-align: center; cursor: pointer; transition: border-color 0.15s; }
+    .cat-card:hover { border-color: var(--terra); }
+    .cat-icon { font-size: 24px; display: block; margin-bottom: 6px; }
+    .cat-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+    .cat-count { font-size: 11px; color: var(--light); }
+
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .fbtn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--white); font-size: 12px; font-weight: 500; cursor: pointer; color: var(--muted); font-family: 'Inter', sans-serif; transition: all 0.15s; }
+    .fbtn:hover { border-color: var(--terra); color: var(--terra); }
+    .fbtn.active { background: var(--terra); color: white; border-color: var(--terra); }
+
+    .places-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pcard { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.15s; }
+    .pcard:hover { transform: translateY(-2px); }
+    .pthumb { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+    .pbadge { position: absolute; top: 8px; right: 8px; font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: 500; }
+    .b-beach { background: #EBF3F9; color: var(--ocean); }
+    .b-culture { background: #FAF0EA; color: var(--terra); }
+    .b-nature { background: #EAF1EC; color: var(--sage); }
+    .b-adventure { background: #FDF6E6; color: var(--gold); }
+    .pinfo { padding: 0.9rem 1rem 1rem; }
+    .pname { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; margin-bottom: 3px; }
+    .pdist { font-size: 11px; color: var(--light); margin-bottom: 5px; }
+    .pdesc { font-size: 12px; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+    .back-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--muted); cursor: pointer; margin-bottom: 1.5rem; }
+    .back-btn:hover { color: var(--terra); }
+    .detail-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; margin-bottom: 1rem; }
+    .detail-emoji { font-size: 52px; display: block; margin-bottom: 1rem; }
+    .detail-title { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 400; margin-bottom: 4px; }
+    .detail-sub { font-size: 13px; color: var(--muted); margin-bottom: 1rem; }
+    .detail-desc { font-size: 14px; color: var(--muted); line-height: 1.8; font-weight: 300; }
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .icard { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+    .icard-label { font-size: 10px; color: var(--light); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px; }
+    .icard-val { font-size: 14px; color: var(--text); line-height: 1.5; }
+
+    .itin-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    .itab { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; color: var(--muted); transition: all 0.15s; }
+    .itab:hover { border-color: var(--terra); color: var(--terra); }
+    .itab.active { background: var(--terra); color: white; border-color: var(--terra); }
+    .itin-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; }
+    .itin-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 3px; }
+    .itin-sub { font-size: 12px; color: var(--light); margin-bottom: 1.5rem; }
+    .stop { display: flex; gap: 1rem; margin-bottom: 1.2rem; }
+    .stop-time { font-size: 11px; color: var(--terra); font-weight: 500; min-width: 56px; padding-top: 2px; }
+    .stop-dot-col { display: flex; flex-direction: column; align-items: center; }
+    .sdot { width: 8px; height: 8px; border-radius: 50%; background: var(--terra); margin-top: 3px; flex-shrink: 0; }
+    .sbar { width: 1px; background: var(--border); flex: 1; min-height: 30px; margin-top: 4px; }
+    .sname { font-size: 14px; font-weight: 500; margin-bottom: 2px; color: var(--text); }
+    .snote { font-size: 12px; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+    .about-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 1.2rem; }
+    .acard { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; }
+    .acard h4 { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+    .acard p { font-size: 13px; color: var(--muted); line-height: 1.7; font-weight: 300; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Travel <span>Ambalangoda</span></div>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a onclick="go('home')"      id="n-home"      class="active">Home</a>
+      <a onclick="go('places')"    id="n-places">Explore</a>
+      <a onclick="go('itinerary')" id="n-itinerary">Itinerary</a>
+      <a onclick="go('about')"     id="n-about">About</a>
+    </div>
+    <div class="nav-user">
+      <span class="nav-user-name" id="nav-username">Loading...</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>Discover <span>Ambalangoda</span><br>and its Surroundings</h1>
+    <p>A complete travel guide to 10 destinations within 25 km of Ambalangoda, Southern Sri Lanka.</p>
+    <button class="hero-btn" onclick="go('places')">Browse All Places</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="stat-n">10</span><span class="stat-l">Attractions</span></div>
+    <div class="stat"><span class="stat-n">25 km</span><span class="stat-l">Radius</span></div>
+    <div class="stat"><span class="stat-n">4</span><span class="stat-l">Categories</span></div>
+  </div>
+  <div class="container">
+    <div class="sec-title">Browse by Category</div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="filterGo('Beach & Relaxation')"><span class="cat-icon">🏖️</span><div class="cat-name">Beach & Relaxation</div><div class="cat-count">2 places</div></div>
+      <div class="cat-card" onclick="filterGo('Culture & History')"><span class="cat-icon">🏛️</span><div class="cat-name">Culture & History</div><div class="cat-count">4 places</div></div>
+      <div class="cat-card" onclick="filterGo('Nature & Wildlife')"><span class="cat-icon">🌿</span><div class="cat-name">Nature & Wildlife</div><div class="cat-count">3 places</div></div>
+      <div class="cat-card" onclick="filterGo('Adventure & Activities')"><span class="cat-icon">🤿</span><div class="cat-name">Adventure & Activities</div><div class="cat-count">1 place</div></div>
+    </div>
+    <div class="sec-title">Featured Places</div>
+    <div class="places-grid" id="home-places"></div>
+  </div>
+</div>
+
+<!-- PLACES -->
+<div class="page" id="page-places">
+  <div class="container">
+    <div class="sec-title">All Destinations</div>
+    <div class="filter-row" id="filters"></div>
+    <div class="places-grid" id="all-places"></div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div class="page" id="page-detail">
+  <div class="container">
+    <div class="back-btn" onclick="go('places')">← Back to places</div>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- ITINERARY -->
+<div class="page" id="page-itinerary">
+  <div class="container">
+    <div class="sec-title">One-Day Itineraries</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:1.2rem;font-weight:300">Pre-planned day trips for different traveler types</p>
+    <div class="itin-tabs">
+      <button class="itab active" onclick="showItin('family',this)">Family</button>
+      <button class="itab" onclick="showItin('solo',this)">Solo</button>
+      <button class="itab" onclick="showItin('couple',this)">Couple</button>
+    </div>
+    <div id="itin-content"></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="container">
+    <div class="sec-title">About This System</div>
+    <p style="color:var(--muted);font-size:14px;font-weight:300;line-height:1.8;max-width:560px">The Travel Ambalangoda system bridges the information gap for tourists visiting the Ambalangoda region of Sri Lanka's Southern Province.</p>
+    <div class="about-grid">
+      <div class="acard"><h4>The Problem</h4><p>Tourists visiting Ambalangoda face difficulties due to scattered, incomplete travel information — no single organized source exists for this region.</p></div>
+      <div class="acard"><h4>The Solution</h4><p>A centralized web-based system providing categorized place details, transport info, entry fees, seasonal advice, and ready-made itineraries.</p></div>
+      <div class="acard"><h4>Technology Stack</h4><p>Frontend: HTML5, CSS3, JavaScript<br>Backend: Laravel (PHP Framework)<br>Database: MySQL<br>Tools: VSCode, Git & GitHub</p></div>
+      <div class="acard"><h4>Developer</h4><p>B.H.A Menuka Tharindu Dilhara<br>Registration: E2320328<br>ITE2953 Final Project<br>University of Moratuwa · 2026</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Auth Guard ──
+  const token = localStorage.getItem('ta_token');
+  if (!token) { window.location.replace('login.html'); }
+
+  // Show user's name in navbar
+  try {
+    const user = JSON.parse(localStorage.getItem('ta_user') || '{}');
+    document.getElementById('nav-username').textContent = user.name ? '👤 ' + user.name : '';
+  } catch(e) {}
+
+  function logout() {
+    localStorage.removeItem('ta_token');
+    localStorage.removeItem('ta_user');
+    window.location.replace('login.html');
+  }
+
+  // ── Data ──
+  const places = [
+    {id:1,name:"Ambalangoda Beach",cat:"Beach & Relaxation",dist:"0 km",emoji:"🏖️",bg:"#EBF3F9",desc:"A scenic coastal beach ideal for swimming, sunsets, and relaxing walks along the shoreline.",hours:"Open 24 hours",fee:"Free entry",transport:"Walking distance from town center",season:"November – April"},
+    {id:2,name:"Sri Vijayarama Viharaya",cat:"Culture & History",dist:"~2 km",emoji:"🛕",bg:"#FAF0EA",desc:"An ancient Buddhist temple featuring large Buddha statues and significant religious heritage.",hours:"6:00 AM – 8:00 PM",fee:"Free (donations welcome)",transport:"Tuk-tuk from town (~LKR 150)",season:"Year-round"},
+    {id:3,name:"Ambalangoda Mask Museum",cat:"Culture & History",dist:"~1 km",emoji:"🎭",bg:"#FAF0EA",desc:"A cultural museum showcasing traditional Sri Lankan mask carving, a craft Ambalangoda is world-famous for.",hours:"8:00 AM – 5:30 PM",fee:"LKR 500 (adults)",transport:"Walking distance or tuk-tuk",season:"Year-round"},
+    {id:4,name:"Madu Ganga River Safari",cat:"Nature & Wildlife",dist:"~5 km",emoji:"🛶",bg:"#EAF1EC",desc:"A UNESCO-recognized wetland offering scenic mangrove boat safaris through a rich biodiversity zone.",hours:"6:00 AM – 6:00 PM",fee:"LKR 2,500–3,500 (boat hire)",transport:"Tuk-tuk (~LKR 300)",season:"Year-round"},
+    {id:5,name:"Kosgoda Turtle Hatchery",cat:"Nature & Wildlife",dist:"~8 km",emoji:"🐢",bg:"#EAF1EC",desc:"A conservation hatchery protecting endangered sea turtles, offering guided visits and turtle release experiences.",hours:"7:00 AM – 6:00 PM",fee:"LKR 500 (adults)",transport:"Bus or tuk-tuk from Ambalangoda",season:"Year-round"},
+    {id:6,name:"Meetiyagoda Moonstone Mine",cat:"Nature & Wildlife",dist:"~10 km",emoji:"💎",bg:"#EAF1EC",desc:"One of the very few moonstone mines in the world, offering a unique geological and cultural experience.",hours:"8:00 AM – 5:00 PM",fee:"Free entry",transport:"Tuk-tuk (~LKR 500)",season:"Year-round"},
+    {id:7,name:"Hikkaduwa Beach",cat:"Adventure & Activities",dist:"~12 km",emoji:"🤿",bg:"#FDF6E6",desc:"A world-renowned beach destination famous for snorkeling, coral reef exploration, and vibrant beach life.",hours:"Open 24 hours",fee:"Free (water sports extra)",transport:"Bus from Ambalangoda (~LKR 50)",season:"November – April"},
+    {id:8,name:"Lunuganga Gardens",cat:"Culture & History",dist:"~15 km",emoji:"🌸",bg:"#FAF0EA",desc:"The country estate of legendary Sri Lankan architect Geoffrey Bawa, featuring beautifully landscaped tropical gardens.",hours:"9:00 AM – 5:00 PM",fee:"LKR 1,500 (adults)",transport:"Tuk-tuk or hired car",season:"Year-round"},
+    {id:9,name:"Galle Fort",cat:"Culture & History",dist:"~20 km",emoji:"🏰",bg:"#FAF0EA",desc:"A UNESCO World Heritage Site featuring Dutch colonial architecture, historic ramparts, boutique shops, and museums.",hours:"Open 24 hours (ramparts)",fee:"Free (museum entry extra)",transport:"Bus or train from Ambalangoda",season:"Year-round"},
+    {id:10,name:"Bentota Beach",cat:"Beach & Relaxation",dist:"~22 km",emoji:"🌅",bg:"#EBF3F9",desc:"A tranquil beach resort area known for water sports, golden sands, and riverside resorts.",hours:"Open 24 hours",fee:"Free (water sports extra)",transport:"Train from Ambalangoda (~LKR 80)",season:"November – April"}
+  ];
+
+  const itins = {
+    family:{title:"Family Day Out",sub:"A comfortable day with children — easy distances, fun activities",stops:[
+      {time:"8:30 AM",name:"Ambalangoda Mask Museum",note:"Start with the famous mask carving museum. Children love watching artisans at work."},
+      {time:"10:00 AM",name:"Ambalangoda Beach",note:"Relax on the beach, swim, and enjoy the morning sun before it gets too hot."},
+      {time:"12:30 PM",name:"Lunch Break",note:"Try local rice and curry at a town restaurant before heading out."},
+      {time:"2:00 PM",name:"Kosgoda Turtle Hatchery",note:"Children will love seeing and learning about the sea turtle conservation efforts."},
+      {time:"4:30 PM",name:"Madu Ganga River Safari",note:"End the day with a peaceful mangrove boat safari — beautiful for all ages."}
+    ]},
+    solo:{title:"Solo Explorer",sub:"Cover more ground, explore culture and nature at your own pace",stops:[
+      {time:"7:00 AM",name:"Ambalangoda Beach",note:"Early morning walk along the beach before the crowds arrive."},
+      {time:"8:30 AM",name:"Sri Vijayarama Viharaya",note:"Visit the ancient temple and enjoy the peaceful morning atmosphere."},
+      {time:"10:00 AM",name:"Ambalangoda Mask Museum",note:"Explore the mask museum and learn about this unique local craft tradition."},
+      {time:"12:00 PM",name:"Meetiyagoda Moonstone Mine",note:"Take a tuk-tuk to the moonstone mine — a one-of-a-kind experience."},
+      {time:"2:30 PM",name:"Hikkaduwa Beach",note:"Head to Hikkaduwa for snorkeling at the coral reef sanctuary."}
+    ]},
+    couple:{title:"Couple's Day Trip",sub:"Scenic spots, relaxed pace, and beautiful views throughout the day",stops:[
+      {time:"9:00 AM",name:"Lunuganga Gardens",note:"Start with Geoffrey Bawa's stunning estate — peaceful, romantic, and beautifully landscaped."},
+      {time:"11:30 AM",name:"Madu Ganga River Safari",note:"A quiet boat ride through mangroves — one of the most scenic experiences in the region."},
+      {time:"1:30 PM",name:"Lunch Break",note:"Fresh seafood lunch at a riverside restaurant near Balapitiya."},
+      {time:"3:00 PM",name:"Galle Fort",note:"Walk the historic ramparts, browse boutique shops, and explore the Dutch fort."},
+      {time:"6:00 PM",name:"Bentota Beach",note:"End the day watching the sunset where the river meets the sea."}
+    ]}
+  };
+
+  const badgeClass={"Beach & Relaxation":"b-beach","Culture & History":"b-culture","Nature & Wildlife":"b-nature","Adventure & Activities":"b-adventure"};
+  const badgeLabel={"Beach & Relaxation":"Beach","Culture & History":"Culture","Nature & Wildlife":"Nature","Adventure & Activities":"Adventure"};
+
+  function card(p){
+    return `<div class="pcard" onclick="showDetail(${p.id})">
+      <div class="pthumb" style="background:${p.bg}"><span>${p.emoji}</span><span class="pbadge ${badgeClass[p.cat]}">${badgeLabel[p.cat]}</span></div>
+      <div class="pinfo"><div class="pname">${p.name}</div><div class="pdist">${p.dist} from Ambalangoda</div><div class="pdesc">${p.desc.slice(0,75)}...</div></div>
+    </div>`;
+  }
+
+  function renderAll(filter){
+    const list=filter==='All'?places:places.filter(p=>p.cat===filter);
+    document.getElementById('all-places').innerHTML=list.map(card).join('');
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===filter));
+  }
+
+  function renderFilters(){
+    const cats=['All','Beach & Relaxation','Culture & History','Nature & Wildlife','Adventure & Activities'];
+    document.getElementById('filters').innerHTML=cats.map(c=>`<button class="fbtn ${c==='All'?'active':''}" data-f="${c}" onclick="renderAll('${c}')">${c}</button>`).join('');
+  }
+
+  function showDetail(id){
+    const p=places.find(x=>x.id===id);
+    document.getElementById('detail-content').innerHTML=`
+      <div class="detail-card">
+        <span class="detail-emoji">${p.emoji}</span>
+        <div class="detail-title">${p.name}</div>
+        <div class="detail-sub">${p.dist} from Ambalangoda · ${p.cat}</div>
+        <div class="detail-desc" style="margin-bottom:1.5rem">${p.desc}</div>
+        <div class="info-grid">
+          <div class="icard"><div class="icard-label">Opening Hours</div><div class="icard-val">${p.hours}</div></div>
+          <div class="icard"><div class="icard-label">Entry Fee</div><div class="icard-val">${p.fee}</div></div>
+          <div class="icard"><div class="icard-label">Getting There</div><div class="icard-val">${p.transport}</div></div>
+          <div class="icard"><div class="icard-label">Best Season</div><div class="icard-val">${p.season}</div></div>
+        </div>
+      </div>`;
+    go('detail');
+  }
+
+  function showItin(key,btn){
+    document.querySelectorAll('.itab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const it=itins[key];
+    document.getElementById('itin-content').innerHTML=`
+      <div class="itin-card">
+        <div class="itin-title">${it.title}</div>
+        <div class="itin-sub">${it.sub}</div>
+        ${it.stops.map((s,i)=>`<div class="stop">
+          <div class="stop-time">${s.time}</div>
+          <div class="stop-dot-col"><div class="sdot"></div>${i<it.stops.length-1?'<div class="sbar"></div>':''}</div>
+          <div style="flex:1;padding-bottom:1rem"><div class="sname">${s.name}</div><div class="snote">${s.note}</div></div>
+        </div>`).join('')}
+      </div>`;
+  }
+
+  function go(name){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+    document.getElementById('page-'+name).classList.add('active');
+    const n=document.getElementById('n-'+name);
+    if(n) n.classList.add('active');
+    if(name==='places'){renderFilters();renderAll('All');}
+    if(name==='itinerary') showItin('family',document.querySelector('.itab'));
+  }
+
+  function filterGo(cat){go('places');setTimeout(()=>renderAll(cat),30);}
+
+  document.getElementById('home-places').innerHTML=places.slice(0,3).map(card).join('');
+</script>
+</body>
+</html>

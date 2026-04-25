@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – Travel Ambalangoda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --white:   #ffffff;
+      --bg:      #F9F7F4;
+      --sand:    #EDE8E0;
+      --border:  #DDD8CE;
+      --text:    #2C2420;
+      --muted:   #7A7068;
+      --light:   #B0A89E;
+      --terra:   #C4714A;
+      --terra2:  #B5613A;
+      --sage:    #6B9478;
+      --ocean:   #4E7FA3;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top Bar ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--terra); }
+
+    /* ── Main Layout ── */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .card-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 1.8rem;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1.8rem;
+    }
+    .tab {
+      flex: 1;
+      padding: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--terra);
+      color: #fff;
+    }
+
+    /* ── Form ── */
+    .field { margin-bottom: 1.1rem; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 5px;
+    }
+    .field input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field input:focus { border-color: var(--terra); background: var(--white); }
+    .field input.error { border-color: #e05a4a; }
+
+    .field-err {
+      font-size: 11px;
+      color: #e05a4a;
+      margin-top: 4px;
+      display: none;
+    }
+    .field-err.show { display: block; }
+
+    /* ── Hidden field (name shown only on register) ── */
+    #name-field { display: none; }
+
+    /* ── Submit Button ── */
+    .btn {
+      width: 100%;
+      padding: 11px;
+      background: var(--terra);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover { background: var(--terra2); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── Alert Banner ── */
+    .alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 1.2rem;
+      display: none;
+      line-height: 1.5;
+    }
+    .alert.err  { background: #fdf0ee; border: 1px solid #f0c4bc; color: #b94033; display: block; }
+    .alert.ok   { background: #eaf4ed; border: 1px solid #b5d9c0; color: #2d7a4a; display: block; }
+
+    /* ── Divider ── */
+    .divider {
+      text-align: center;
+      font-size: 11px;
+      color: var(--light);
+      margin: 1.4rem 0 0;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--light);
+      padding: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="logo" href="index.html">Travel <span>Ambalangoda</span></a>
+</div>
+
+<div class="main">
+  <div class="card">
+    <div class="card-heading">Welcome back</div>
+    <div class="card-sub">Sign in or create an account to continue</div>
+
+    <!-- Tab switcher -->
+    <div class="tabs">
+      <button class="tab active" id="tab-login"    onclick="switchTab('login')">Login</button>
+      <button class="tab"        id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="alert"></div>
+
+    <!-- Form -->
+    <form id="auth-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- Name (register only) -->
+      <div class="field" id="name-field">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="B.H.A Menuka Dilhara" autocomplete="name">
+        <div class="field-err" id="name-err">Please enter your name</div>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        <div class="field-err" id="email-err">Please enter a valid email</div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+        <div class="field-err" id="password-err">Password must be at least 6 characters</div>
+      </div>
+
+      <button type="submit" class="btn" id="submit-btn">
+        <span id="btn-label">Login</span>
+        <span class="spinner" id="spinner"></span>
+      </button>
+    </form>
+
+    <div class="divider" id="switch-hint">
+      Don't have an account? <a href="#" onclick="switchTab('register');return false;" style="color:var(--terra)">Register here</a>
+    </div>
+  </div>
+</div>
+
+<footer>ITE2953 Final Project · B.H.A Menuka Tharindu Dilhara · E2320328</footer>
+
+<script>
+  // ── CONFIG: point this at your DigitalOcean droplet IP or domain ──
+  const API_BASE = 'https://YOUR_DROPLET_IP_OR_DOMAIN/api';
+
+  let mode = 'login'; // 'login' | 'register'
+
+  // If already logged in, skip this page
+  if (localStorage.getItem('ta_token')) {
+    window.location.replace('app.html');
+  }
+
+  function switchTab(tab) {
+    mode = tab;
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    document.getElementById('name-field').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('btn-label').textContent = tab === 'login' ? 'Login' : 'Create Account';
+    document.getElementById('switch-hint').innerHTML = tab === 'login'
+      ? 'Don\'t have an account? <a href="#" onclick="switchTab(\'register\');return false;" style="color:var(--terra)">Register here</a>'
+      : 'Already have an account? <a href="#" onclick="switchTab(\'login\');return false;" style="color:var(--terra)">Login</a>';
+    clearErrors();
+    setAlert('', '');
+  }
+
+  function clearErrors() {
+    ['name','email','password'].forEach(id => {
+      document.getElementById(id).classList.remove('error');
+      document.getElementById(id+'-err').classList.remove('show');
+    });
+  }
+
+  function setAlert(msg, type) {
+    const el = document.getElementById('alert');
+    el.className = 'alert' + (type ? ' ' + type : '');
+    el.textContent = msg;
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = on;
+    document.getElementById('spinner').style.display = on ? 'block' : 'none';
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    clearErrors();
+    setAlert('', '');
+
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const name     = document.getElementById('name').value.trim();
+
+    // Simple validation
+    let valid = true;
+    if (mode === 'register' && !name) {
+      document.getElementById('name').classList.add('error');
+      document.getElementById('name-err').classList.add('show');
+      valid = false;
+    }
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      document.getElementById('email').classList.add('error');
+      document.getElementById('email-err').classList.add('show');
+      valid = false;
+    }
+    if (password.length < 6) {
+      document.getElementById('password').classList.add('error');
+      document.getElementById('password-err').classList.add('show');
+      valid = false;
+    }
+    if (!valid) return;
+
+    setLoading(true);
+
+    const endpoint = mode === 'login' ? '/login' : '/register';
+    const body     = mode === 'login'
+      ? { email, password }
+      : { name, email, password, password_confirmation: password };
+
+    try {
+      const res  = await fetch(API_BASE + endpoint, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body:    JSON.stringify(body)
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Show server validation message
+        const msg = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Something went wrong.');
+        setAlert(msg, 'err');
+      } else {
+        // Save token and user info
+        localStorage.setItem('ta_token', data.token);
+        localStorage.setItem('ta_user',  JSON.stringify(data.user));
+        setAlert('Success! Redirecting...', 'ok');
+        setTimeout(() => window.location.replace('app.html'), 600);
+      }
+    } catch (err) {
+      setAlert('Cannot reach the server. Check your connection or the API URL.', 'err');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>
+</body>
+</html>
