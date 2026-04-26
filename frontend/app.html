@@ -382,13 +382,30 @@
     document.getElementById('filters').innerHTML=cats.map(c=>`<button class="fbtn ${c==='All'?'active':''}" data-f="${c}" onclick="renderAll('${c}')">${c}</button>`).join('');
   }
 
+  // ── Image Gallery Map (frontend only, no DB needed) ──
+  const placeImages = {
+    'Bentota Beach':            ['1/beach.jpg','1/beauty-at-bentota-beach.jpg','1/bentota-beach-sri-lanka-2.jpg','1/caption.jpg','1/gallery_Bentota_Beach_Sri_Lanka.jpg'],
+    'Ambalangoda Beach':        ['2/Ambalangoda-Beach-1.webp','2/Ambalangoda-Beach-2.webp','2/Ambalangoda-Beach-3.webp','2/Ambalangoda-Beach-lighthouse-768x1152.webp','2/Ambalangoda-Beach.webp'],
+    'Sri Vijayarama Viharaya':  ['3/557544969_1217992867036801_2805698239178676527_n.jpg','3/caption (1).jpg','3/caption (2).jpg','3/caption.jpg','3/sri-vijayarama-viharaya.jpg'],
+    'Galle Fort':               ['4/Galle-Fort-Clock-Tower-2.webp','4/Galle-Fort-Clock-Tower-3.webp','4/Galle-Fort-Clock-Tower.webp','4/galle-fort-1050x700-1.jpg','4/gallery_Galle_Dutch_Fort.jpg'],
+    'Lunuganga Gardens':        ['5/DJI_0530-Edit-1-1.jpg','5/lake-dedduwa_orig.jpg','5/main-plantation-house-of-lunuganga-900_orig.jpg','5/plain-of-jars-900_orig.jpg','5/view-from-lunuganga-s-red-terrace-900_orig.jpg'],
+    'Hikkaduwa Beach':          ['6/20200321-180704-largejpg.jpg','6/image-result-for-importance.jpg','6/photo0jpg.jpg','6/photo1jpg.jpg','6/photo4jpg.jpg'],
+    'Meetiyagoda Moonstone Mine':['7/Moonstone1920x775.jpg','7/meetiyagoda-01-900_orig.jpg','7/meetiyagoda-04-900_orig.jpg','7/meetiyagoda-moonstone-mine-1_orig.jpg','7/meetiyagoda-moonstone-mine-2_orig.jpg'],
+  };
+
   function showDetail(id){
     const p=places.find(x=>x.id===id);
+    const imgs = placeImages[p.name] || [];
+    const gallery = imgs.length ? `
+      <div style="display:flex;gap:10px;overflow-x:auto;padding:1rem 0 0.5rem;margin-bottom:1rem;">
+        ${imgs.map(src=>`<img src="${src}" style="height:140px;border-radius:10px;flex-shrink:0;object-fit:cover;cursor:pointer;" onclick="this.style.height=this.style.height==='260px'?'140px':'260px'">`).join('')}
+      </div>` : '';
     document.getElementById('detail-content').innerHTML=`
       <div class="detail-card">
         <span class="detail-emoji">${p.emoji}</span>
         <div class="detail-title">${p.name}</div>
         <div class="detail-sub">${p.dist} from Ambalangoda · ${p.cat}</div>
+        ${gallery}
         <div class="detail-desc" style="margin-bottom:1.5rem">${p.desc}</div>
         <div class="info-grid">
           <div class="icard"><div class="icard-label">Opening Hours</div><div class="icard-val">${p.hours}</div></div>
@@ -399,6 +416,7 @@
       </div>`;
     go('detail');
   }
+
 
   let customItinerary = [];
 
