@@ -170,6 +170,17 @@
     .w-cond { font-size: 15px; font-weight: 400; opacity: 0.9; margin-bottom: 4px; }
     .w-adv { font-size: 12px; opacity: 0.8; line-height: 1.4; max-width: 300px; font-weight: 300; }
     .w-icon { font-size: 50px; }
+    
+    /* Custom Itinerary CSS */
+    .custom-add-row { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+    .custom-select { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter', sans-serif; outline: none; }
+    .custom-select:focus { border-color: var(--terra); }
+    .custom-add-btn { background: var(--terra); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .custom-add-btn:hover { background: #B5613A; }
+    .custom-export-btn { background: var(--ocean); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-top: 1rem; width: 100%; display: flex; justify-content: center; gap: 8px; align-items: center; }
+    .custom-export-btn:hover { background: #3d6a8a; }
+    .custom-remove { color: var(--terra); font-size: 11px; cursor: pointer; border: 1px solid var(--terra); padding: 3px 8px; border-radius: 4px; float: right; font-weight: 500; }
+    .custom-remove:hover { background: var(--terra); color: white; }
   </style>
 </head>
 <body>
@@ -260,6 +271,7 @@
       <button class="itab active" onclick="showItin('family',this)">Family</button>
       <button class="itab" onclick="showItin('solo',this)">Solo</button>
       <button class="itab" onclick="showItin('couple',this)">Couple</button>
+      <button class="itab" onclick="showItin('custom',this)">Custom</button>
     </div>
     <div id="itin-content"></div>
   </div>
@@ -388,9 +400,40 @@
     go('detail');
   }
 
+  let customItinerary = [];
+
   function showItin(key,btn){
     document.querySelectorAll('.itab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
+    
+    if (key === 'custom') {
+      let options = '<option value="">Select a place to add...</option>';
+      places.forEach(p => {
+        options += `<option value="${p.id}">${p.name} - ${p.cat}</option>`;
+      });
+
+      document.getElementById('itin-content').innerHTML=`
+        <div class="itin-card">
+          <div class="itin-title">Custom Itinerary</div>
+          <div class="itin-sub">Build your own perfect day by selecting places below.</div>
+          
+          <div class="custom-add-row">
+            <select id="custom-place-select" class="custom-select">
+              ${options}
+            </select>
+            <button class="custom-add-btn" onclick="addToCustom()">Add Place</button>
+          </div>
+          
+          <div id="custom-stops-list"></div>
+          
+          <button class="custom-export-btn" onclick="exportCustom()" id="export-btn" style="display:none;">
+            <span>📄</span> Export Itinerary
+          </button>
+        </div>`;
+      renderCustomStops();
+      return;
+    }
+
     const it=itins[key];
     document.getElementById('itin-content').innerHTML=`
       <div class="itin-card">
@@ -402,6 +445,75 @@
           <div style="flex:1;padding-bottom:1rem"><div class="sname">${s.name}</div><div class="snote">${s.note}</div></div>
         </div>`).join('')}
       </div>`;
+  }
+
+  function addToCustom() {
+    const select = document.getElementById('custom-place-select');
+    const placeId = parseInt(select.value);
+    if (!placeId) return;
+    
+    const place = places.find(p => p.id === placeId);
+    if (place) {
+      customItinerary.push(place);
+      renderCustomStops();
+    }
+    select.value = ''; // Reset
+  }
+
+  function removeFromCustom(index) {
+    customItinerary.splice(index, 1);
+    renderCustomStops();
+  }
+
+  function renderCustomStops() {
+    const list = document.getElementById('custom-stops-list');
+    const exportBtn = document.getElementById('export-btn');
+    if (!list) return;
+
+    if (customItinerary.length === 0) {
+      list.innerHTML = '<div style="color:var(--muted); font-size:13px; text-align:center; padding: 2rem 0; border: 1px dashed var(--border); border-radius: 8px;">Your itinerary is empty. Select places above to add them.</div>';
+      exportBtn.style.display = 'none';
+      return;
+    }
+
+    exportBtn.style.display = 'flex';
+    list.innerHTML = customItinerary.map((p, i) => `
+      <div class="stop">
+        <div class="stop-time" style="min-width: 60px;">Stop ${i + 1}</div>
+        <div class="stop-dot-col"><div class="sdot"></div>${i < customItinerary.length - 1 ? '<div class="sbar"></div>' : '<div class="sbar" style="background:transparent"></div>'}</div>
+        <div style="flex:1;padding-bottom:1rem">
+          <div class="sname">${p.name} <button class="custom-remove" onclick="removeFromCustom(${i})">Remove</button></div>
+          <div class="snote">${p.desc.slice(0, 100)}...<br><strong>Fee:</strong> ${p.fee} | <strong>Open:</strong> ${p.hours}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function exportCustom() {
+    if (customItinerary.length === 0) return;
+    
+    let content = "MY AMBALANGODA CUSTOM ITINERARY\n";
+    content += "===================================\n\n";
+    
+    customItinerary.forEach((p, i) => {
+      content += `Stop ${i + 1}: ${p.name}\n`;
+      content += `-----------------------------------\n`;
+      content += `Category: ${p.cat}\n`;
+      content += `Hours: ${p.hours}\n`;
+      content += `Entry Fee: ${p.fee}\n`;
+      content += `Transport: ${p.transport}\n`;
+      content += `Description: ${p.desc}\n\n`;
+    });
+
+    content += "Generated by Travel Ambalangoda\n";
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'My_Ambalangoda_Itinerary.txt';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   function go(name){
