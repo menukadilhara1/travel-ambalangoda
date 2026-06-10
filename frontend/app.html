@@ -614,7 +614,7 @@
   // ── Fetch Destinations from Laravel API ──
   async function fetchDestinations() {
     try {
-      const response = await fetch('http://167.71.193.120:8080/api/places');
+      const response = await fetch('/api/places');
       if (response.ok) {
         places = await response.json();
         // Ensure decimal and int types are preserved properly
