@@ -282,13 +282,13 @@
 <!-- ABOUT -->
 <div class="page" id="page-about">
   <div class="container">
-    <div class="sec-title">About This System</div>
-    <p style="color:var(--muted);font-size:14px;font-weight:300;line-height:1.8;max-width:560px">The Travel Ambalangoda system bridges the information gap for tourists visiting the Ambalangoda region of Sri Lanka's Southern Province.</p>
+    <div class="sec-title">Discover Ambalangoda</div>
+    <p style="color:var(--muted);font-size:14px;font-weight:300;line-height:1.8;max-width:700px">Welcome to Ambalangoda, a vibrant coastal town in Sri Lanka's Southern Province. Known for its rich cultural heritage, pristine beaches, and unique crafts, Ambalangoda offers an authentic blend of tradition and relaxation away from the heavy tourist crowds.</p>
     <div class="about-grid">
-      <div class="acard"><h4>The Problem</h4><p>Tourists visiting Ambalangoda face difficulties due to scattered, incomplete travel information — no single organized source exists for this region.</p></div>
-      <div class="acard"><h4>The Solution</h4><p>A centralized web-based system providing categorized place details, transport info, entry fees, seasonal advice, and ready-made itineraries.</p></div>
-      <div class="acard"><h4>Technology Stack</h4><p>Frontend: HTML5, CSS3, JavaScript<br>Backend: Laravel (PHP Framework)<br>Database: MySQL<br>Tools: VSCode, Git & GitHub</p></div>
-      <div class="acard"><h4>Developer</h4><p>B.H.A Menuka Tharindu Dilhara<br>Registration: E2320328<br>ITE2953 Final Project<br>University of Moratuwa · 2026</p></div>
+      <div class="acard"><h4>🎭 Cultural Heart</h4><p>World-renowned as the center of Sri Lankan mask carving and traditional devil dancing (Kolam). Experience centuries of folklore coming to life in local workshops.</p></div>
+      <div class="acard"><h4>🌊 Pristine Coasts</h4><p>Enjoy uncrowded, golden sandy beaches perfect for peaceful walks, sunset viewing, and safe dips in natural rock pools during low tide.</p></div>
+      <div class="acard"><h4>🌿 Rich Biodiversity</h4><p>Explore the complex coastal wetland ecosystems of the Madu Ganga, teeming with diverse wildlife from water monitors to exotic birds on a river safari.</p></div>
+      <div class="acard"><h4>💎 Unique Heritage</h4><p>Discover rare blue-glowing moonstones in Meetiyagoda, visit pioneering sea turtle conservation projects, and explore ancient Buddhist temples.</p></div>
     </div>
   </div>
 </div>
@@ -614,7 +614,7 @@
   // ── Fetch Destinations from Laravel API ──
   async function fetchDestinations() {
     try {
-      const response = await fetch('/api/places');
+      const response = await fetch('http://167.71.193.120:8080/api/places');
       if (response.ok) {
         places = await response.json();
         // Ensure decimal and int types are preserved properly
